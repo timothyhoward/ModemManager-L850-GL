@@ -58,7 +58,7 @@ Utilities to use the MBIM protocol from the command line.
 %meson_install
 
 %files
-%license COPYING.LIB
+%license LICENSES/LGPL-2.1-or-later.txt
 %doc NEWS README.md
 %{_libdir}/libmbim-glib.so.*
 %{_libdir}/girepository-1.0/Mbim-1.0.typelib
