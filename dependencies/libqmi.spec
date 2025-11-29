@@ -23,7 +23,6 @@ BuildRequires:  pkgconfig(gudev-1.0)
 BuildRequires:  pkgconfig(qrtr-glib) >= 1.2.0
 BuildRequires:  pkgconfig(mbim-glib) >= 1.28.0
 BuildRequires:  pkgconfig(gobject-introspection-1.0)
-BuildRequires:  gtk-doc
 BuildRequires:  help2man
 BuildRequires:  pkgconfig(bash-completion)
 
@@ -51,7 +50,7 @@ Utilities to use the QMI protocol from the command line.
 
 %build
 %meson \
-    -Dgtk_doc=true \
+    -Dgtk_doc=false \
     -Dmbim_qmux=true \
     -Dqrtr=true \
     -Dintrospection=true
@@ -72,9 +71,6 @@ Utilities to use the QMI protocol from the command line.
 %{_libdir}/libqmi-glib.so
 %{_libdir}/pkgconfig/qmi-glib.pc
 %{_datadir}/gir-1.0/Qmi-1.0.gir
-%dir %{_datadir}/gtk-doc
-%dir %{_datadir}/gtk-doc/html
-%{_datadir}/gtk-doc/html/libqmi-glib/
 
 %files utils
 %{_bindir}/qmicli
