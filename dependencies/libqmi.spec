@@ -5,7 +5,7 @@
 %global forgeurl https://gitlab.freedesktop.org/mobile-broadband/libqmi
 
 Name:           libqmi
-Version:        1.35.6
+Version:        1.35.5-dev
 Release:        1%{?dist}
 Summary:        Support library to use the Qualcomm MSM Interface (QMI) protocol
 
