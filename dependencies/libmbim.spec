@@ -5,7 +5,7 @@
 %global forgeurl https://gitlab.freedesktop.org/mobile-broadband/libmbim
 
 Name:           libmbim
-Version:        1.31.2
+Version:        1.32
 Release:        1%{?dist}
 Summary:        Support library for the Mobile Broadband Interface Model (MBIM) protocol
 
@@ -81,5 +81,5 @@ Utilities to use the MBIM protocol from the command line.
 %{_datadir}/bash-completion/completions/mbimcli
 
 %changelog
-* Sat Nov 29 2025 Tim Howard <timothyhoward@outlook.com> - 1.31.2-1
-- Update to 1.31.2 for ModemManager 1.25.95 compatibility
+* Sat Nov 29 2025 Tim Howard <timothyhoward@outlook.com> - 1.32
+- Update to 1.32 for ModemManager 1.25.95 compatibility
