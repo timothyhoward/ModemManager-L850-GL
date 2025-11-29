@@ -40,7 +40,7 @@ BuildRequires:  pkgconfig(gobject-2.0)
 BuildRequires:  pkgconfig(gio-2.0)
 BuildRequires:  pkgconfig(gio-unix-2.0)
 BuildRequires:  pkgconfig(gudev-1.0) >= 232
-BuildRequires:  pkgconfig(qmi-glib) >= 1.35.2
+BuildRequires:  pkgconfig(qmi-glib) >= 1.37.95
 BuildRequires:  pkgconfig(mbim-glib) >= 1.29.2
 BuildRequires:  pkgconfig(qrtr-glib) >= 1.2.0
 BuildRequires:  pkgconfig(polkit-gobject-1) >= 0.97
