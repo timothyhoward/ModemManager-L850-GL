@@ -47,7 +47,7 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 Utilities to use the QMI protocol from the command line.
 
 %prep
-%autosetup -p1
+%autosetup -p1 -n %{name}-%{version}-dev
 
 %build
 %meson \

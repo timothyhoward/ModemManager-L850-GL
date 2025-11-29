@@ -107,7 +107,7 @@ Requires:       %{name}-glib%{?_isa} = %{version}-%{release}
 Vala bindings for ModemManager.
 
 %prep
-%autosetup -p1
+%autosetup -p1 -n %{name}-%{version}-dev
 
 %build
 # Let's avoid BuildRequiring bash-completion because it changes behavior
