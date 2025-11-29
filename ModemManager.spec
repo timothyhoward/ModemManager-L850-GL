@@ -13,7 +13,7 @@
 %global forgeurl https://gitlab.freedesktop.org/mobile-broadband/ModemManager
 
 Name:           ModemManager
-Version:        1.25.95
+Version:        1.25.95-dev
 Release:        1%{?dist}
 Summary:        Mobile broadband modem management service
 
