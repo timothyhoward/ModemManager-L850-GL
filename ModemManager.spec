@@ -176,16 +176,13 @@ cp -a cli/mmcli-completion %{buildroot}%{_datadir}/bash-completion/completions/m
 %{_libdir}/girepository-1.0/ModemManager-1.0.typelib
 
 %files devel
-%dir %{_includedir}/%{name}
-%{_includedir}/%{name}/*.h
-%exclude %{_includedir}/%{name}/libmm-glib.h
-%exclude %{_includedir}/%{name}/mm-*.h
+%{_includedir}/ModemManager/
 %{_libdir}/pkgconfig/%{name}.pc
 %{_datadir}/dbus-1/interfaces/org.freedesktop.ModemManager1*.xml
 
 %files glib-devel
-%{_includedir}/%{name}/libmm-glib.h
-%{_includedir}/%{name}/mm-*.h
+%dir %{_includedir}/libmm-glib
+%{_includedir}/libmm-glib/*.h
 %{_libdir}/libmm-glib.so
 %{_libdir}/pkgconfig/mm-glib.pc
 %{_datadir}/gir-1.0/ModemManager-1.0.gir
