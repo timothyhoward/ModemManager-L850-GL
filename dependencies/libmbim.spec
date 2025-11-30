@@ -5,13 +5,13 @@
 %global forgeurl https://gitlab.freedesktop.org/mobile-broadband/libmbim
 
 Name:           libmbim
-Version:        1.32.0
+Version:        1.33.1
 Release:        1%{?dist}
 Summary:        Support library for the Mobile Broadband Interface Model (MBIM) protocol
 
 License:        LGPL-2.1-or-later
 URL:            %{forgeurl}
-Source:         %{forgeurl}/-/archive/%{version}/%{name}-%{version}.tar.bz2
+Source:         %{forgeurl}/-/archive/%{version}-dev/%{name}-%{version}-dev.tar.bz2
 
 BuildRequires:  meson >= 0.53.0
 BuildRequires:  gcc
@@ -45,7 +45,7 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 Utilities to use the MBIM protocol from the command line.
 
 %prep
-%autosetup -p1
+%autosetup -p1 -n %{name}-%{version}-dev
 
 %build
 %meson \
