@@ -7,6 +7,7 @@ This repository contains the spec file and build configuration to create a Fedor
 ModemManager 1.25.95 is a **development snapshot** (not a stable release). It includes:
 - Improved support for Fibocom modems (L850-GL, FM350-GL, etc.)
 - Enhanced MBIM and QMI protocol support
+- Upstream XMM7360 parser hardening that prevents malformed modem responses from crashing ModemManager
 - Various bug fixes and improvements from the 1.25.x development branch
 
 ## Prerequisites
@@ -22,6 +23,13 @@ Check if your kernel has the iosm driver:
 modinfo iosm
 ```
 
+The Intel XMM7360 FCC-unlock helper also requires `xxd`. The COPR package
+declares this as a runtime dependency, but it can be checked explicitly with:
+
+```bash
+command -v xxd
+```
+
 ### Important Notes About L850-GL
 
 The L850-GL modem has complex Linux support:
@@ -30,9 +38,16 @@ The L850-GL modem has complex Linux support:
    - On some laptops, you may need to switch from PCIe to USB mode
    - See https://github.com/xmm7360/xmm7360-usb-modeswitch for the mode-switching tool
 
-2. **MBIM Interface**: ModemManager communicates via MBIM, but the L850-GL's MBIM support varies by firmware version
+2. **PCIe control interfaces**: In native PCIe mode, the `iosm` driver exposes
+   AT, network, and XMMRPC ports. ModemManager uses XMMRPC for the L850-GL's
+   modem control and data setup; it does not use MBIM on this path. MBIM is
+   relevant only when a machine can switch the modem to USB mode.
 
 3. **SIM Detection Issues**: Some users report SIM detection issues that require additional scripts
+
+4. **FCC unlock**: The XMM7360 FCC-unlock helper is shipped disabled and must
+   be explicitly enabled on systems that require it. See the installation step
+   below.
 
 ## Building the COPR
 
@@ -62,7 +77,7 @@ You need to add three packages to your COPR project. Go to **Packages → New Pa
 **Package 1: libmbim** (build this first)
 - Package Name: `libmbim`
 - Source Type: SCM
-- Clone URL: `https://gitlab.com/YOUR_USERNAME/modemmanager-copr` (your repo)
+- Clone URL: `https://github.com/timothyhoward/ModemManager-L850-GL.git`
 - Subdirectory: (leave empty)
 - Spec File: `dependencies/libmbim.spec`
 - SRPM Build Method: make srpm
@@ -70,7 +85,7 @@ You need to add three packages to your COPR project. Go to **Packages → New Pa
 **Package 2: libqmi** (build after libmbim completes)
 - Package Name: `libqmi`
 - Source Type: SCM
-- Clone URL: `https://gitlab.com/YOUR_USERNAME/modemmanager-copr`
+- Clone URL: `https://github.com/timothyhoward/ModemManager-L850-GL.git`
 - Subdirectory: (leave empty)
 - Spec File: `dependencies/libqmi.spec`
 - SRPM Build Method: make srpm
@@ -78,7 +93,7 @@ You need to add three packages to your COPR project. Go to **Packages → New Pa
 **Package 3: ModemManager** (build after libqmi completes)
 - Package Name: `ModemManager`
 - Source Type: SCM
-- Clone URL: `https://gitlab.com/YOUR_USERNAME/modemmanager-copr`
+- Clone URL: `https://github.com/timothyhoward/ModemManager-L850-GL.git`
 - Subdirectory: (leave empty)
 - Spec File: `ModemManager.spec`
 - SRPM Build Method: make srpm
@@ -106,9 +121,19 @@ sudo dnf copr enable YOUR_USERNAME/ModemManager-1.25.95
 # Install/upgrade packages
 sudo dnf upgrade libmbim libqmi ModemManager
 
+# Enable the XMM7360 FCC-unlock helper
+sudo install -d -m 0755 /etc/ModemManager/fcc-unlock.d
+sudo ln -sfn \
+  /usr/share/ModemManager/fcc-unlock.available.d/8086:7360 \
+  /etc/ModemManager/fcc-unlock.d/8086:7360
+
 # Restart ModemManager
 sudo systemctl restart ModemManager
 ```
+
+The helper invokes `xxd` to encode and decode XMMRPC messages. If `xxd` is
+missing, the helper can wait indefinitely for a response until ModemManager's
+FCC-unlock timeout kills it.
 
 ### Option 3: Local Build
 
@@ -135,6 +160,7 @@ sudo dnf install ~/rpmbuild/RPMS/x86_64/libqmi-*.rpm
 
 # Build ModemManager last
 cp ModemManager.spec ~/rpmbuild/SPECS/
+cp patches/*.patch ~/rpmbuild/SOURCES/
 cd ~/rpmbuild/SOURCES && spectool -g -R ~/rpmbuild/SPECS/ModemManager.spec
 sudo dnf builddep ~/rpmbuild/SPECS/ModemManager.spec
 rpmbuild -ba ~/rpmbuild/SPECS/ModemManager.spec
@@ -144,8 +170,8 @@ sudo dnf install ~/rpmbuild/RPMS/x86_64/ModemManager-*.rpm
 ## Dependency Requirements
 
 ModemManager 1.25.95 requires updated versions of:
-- `libqmi` >= 1.35.2
-- `libmbim` >= 1.29.2
+- `libqmi` >= 1.37.95
+- `libmbim` >= 1.33.1
 - `libqrtr-glib` >= 1.2.0
 
 If your Fedora version doesn't have these versions, you may need to build them from COPRs or source as well.
@@ -197,6 +223,22 @@ Some L850-GL modems require the SIM to be inserted before boot. Try:
 2. Insert SIM card
 3. Power on
 
+### FCC Unlock Fails or ModemManager Exits
+
+Confirm that `xxd` is installed and that the XMM7360 helper is enabled:
+
+```bash
+rpm -q xxd
+readlink -f /etc/ModemManager/fcc-unlock.d/8086:7360
+journalctl -u ModemManager -b | grep -i fcc
+```
+
+The helper symlink should resolve to:
+
+```text
+/usr/share/ModemManager/fcc-unlock.available.d/8086:7360
+```
+
 ### USB Mode Switch (if needed)
 
 For laptops where PCIe mode doesn't work:
@@ -210,6 +252,7 @@ cd xmm7360-usb-modeswitch
 ## Files in This Repository
 
 - `ModemManager.spec` - The RPM spec file for building ModemManager 1.25.95
+- `patches/` - Local packaging fixes applied after the upstream backports
 - `.copr/Makefile` - Build instructions for Fedora COPR
 - `README.md` - This file
 

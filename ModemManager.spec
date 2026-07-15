@@ -14,23 +14,41 @@
 
 Name:           ModemManager
 Version:        1.25.95
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Mobile broadband modem management service
 
 License:        GPL-2.0-or-later
 URL:            %{forgeurl}
 Source:         %{forgeurl}/-/archive/%{version}-dev/%{name}-%{version}-dev.tar.bz2
 
+# XMM7360 response parser hardening from upstream merge request !1421.
+# These changes replace assertions on modem-provided data with recoverable
+# errors and add coverage for malformed XMMRPC responses.
+Patch0:         %{forgeurl}/-/commit/1565e3ada74ecac6e0493a25acff3f828ff03f93.patch
+Patch1:         %{forgeurl}/-/commit/07dc7e7304d81c3127d5259c309e89f819ff4ef4.patch
+Patch2:         %{forgeurl}/-/commit/3f7b39075c379f31b009af7665890ef32f1591c8.patch
+Patch3:         %{forgeurl}/-/commit/4fead86d247f0a5c61d57d3155e0580f8c01d9b0.patch
+Patch4:         %{forgeurl}/-/commit/64d8053413b8e7583a6176e9f3397aaa4135372f.patch
+Patch5:         %{forgeurl}/-/commit/d6fe0722c9b37f7adbca8f1b4155ebada23a287b.patch
+Patch6:         %{forgeurl}/-/commit/a486776a445bf39a51cb9f93d4c73601329c0c7b.patch
+Patch7:         %{forgeurl}/-/commit/a94dd40a2a849046510206480964a06b99118530.patch
+# Ensure the new protocol test waits for its generated enum header. This is
+# needed when the upstream series is applied to the 1.25.95 snapshot.
+Patch8:         0009-intel-xmm7360-test-generated-header.patch
+
 # For mbim-proxy and qmi-proxy
 Requires:       libmbim-utils
 Requires:       libqmi-utils
 Requires:       %{name}-glib%{?_isa} = %{version}-%{release}
+# Required by the Intel XMM7360 FCC-unlock helper.
+Requires:       xxd
 
 # Don't allow older versions of these than what we built against,
 # because they add new API w/o versioning it or bumping the SONAME
 Conflicts:      glib2%{?_isa} < %{glib2_version}
-Conflicts:      libqmi-glib%{?_isa} < %{qmi_version}
-Conflicts:      libmbim-glib%{?_isa} < %{mbim_version}
+Conflicts:      libqmi%{?_isa} < %{qmi_version}
+Conflicts:      libmbim%{?_isa} < %{mbim_version}
+Conflicts:      libqrtr-glib%{?_isa} < %{qrtr_version}
 
 BuildRequires:  meson
 BuildRequires:  gcc
@@ -196,6 +214,12 @@ cp -a cli/mmcli-completion %{buildroot}%{_datadir}/bash-completion/completions/m
 %{_datadir}/vala/vapi/libmm-glib.vapi
 
 %changelog
+* Wed Jul 15 2026 Tim Howard <timothyhoward@outlook.com> - 1.25.95-2
+- Require xxd for the Intel XMM7360 FCC-unlock helper
+- Backport upstream XMM7360 response parser hardening
+- Fix the backported Intel protocol test's generated-header dependency
+- Correct Fedora runtime library conflict package names
+
 * Sat Nov 29 2025 Tim Howard <timothyhoward@outlook.com> - 1.25.95-1
 - Update to 1.25.95 development release
 - Added support for additional Fibocom modems including L850-GL
