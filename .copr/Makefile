@@ -24,6 +24,9 @@ srpm:
 
 	# Copy the spec file to SPECS
 	cp $(spec) ~/rpmbuild/SPECS/
+
+	# Copy repository-local patches referenced by the ModemManager spec
+	cp patches/*.patch ~/rpmbuild/SOURCES/
 	
 	# Download the source tarball(s) defined in the spec
 	cd ~/rpmbuild/SOURCES && \

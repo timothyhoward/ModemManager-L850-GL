@@ -1,0 +1,27 @@
+diff --git a/src/plugins/meson.build b/src/plugins/meson.build
+index d1428ba6..577eab80 100644
+--- a/src/plugins/meson.build
++++ b/src/plugins/meson.build
+@@ -618,7 +618,7 @@ if plugins_options['intel']
+     capture: true,
+   )
+ 
+-  sources += custom_target(
++  enums_types_h = custom_target(
+     enums_types + '.h',
+     input: headers,
+     output: enums_types + '.h',
+@@ -631,11 +631,13 @@ if plugins_options['intel']
+       '@INPUT@'],
+     capture: true,
+   )
++  sources += enums_types_h
+ 
+   test_sources = files(
+     'intel/mm-xmmrpc-xmm7360-protocol.c',
+     'intel/tests/test-xmmrpc-xmm7360-protocol.c',
+   )
++  test_sources += enums_types_h
+ 
+   plugins += {'plugin-intel': {
+     'plugin': true,
